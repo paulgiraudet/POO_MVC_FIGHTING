@@ -52,7 +52,7 @@ class Character {
      * @return void
      */
     public function setId(int $id){
-        $id = int($id);
+        $id = (int) $id;
         if ($id > 0) {
             $this->_id = $id;
         }
@@ -75,7 +75,7 @@ class Character {
      * @return void
      */
     public function setDamage(int $damage){
-        $damage = int($damage);
+        $damage = (int) $damage;
         if ($damage >= 0 && $damage <= 100) {
             $this->_damage = $damage;
         }
