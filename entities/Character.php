@@ -2,12 +2,12 @@
 
 declare(strict_types = 1);
 
-
 class Character {
-    private $_id,
-            $_name,
-            $_damage;
+    protected   $id,
+                $name,
+                $damage;
 
+    // const SELF_DAMAGE = "Mais pourquoi tu te tapes ?!";
     const DAMAGE_TAKEN = " a pris 5 points de dégâts !";
     const KILL = " est mort !";
 
@@ -22,7 +22,7 @@ class Character {
      * @return void
      */
     public function hydrate(array $dataChar){
-        foreach ($$dataChar as $key => $value) {
+        foreach ($dataChar as $key => $value) {
             $method = 'set' . ucfirst($key);
             if (method_exists($this, $method)) {
                 $this->$method($value);
@@ -36,13 +36,13 @@ class Character {
      * @return void
      */
     public function getId(){
-        return $this->_id;
+        return $this->id;
     }
     public function getName(){
-        return $this->_name;
+        return $this->name;
     }
     public function getDamage(){
-        return $this->_damage;
+        return $this->damage;
     }
 
     /**
@@ -51,10 +51,10 @@ class Character {
      * @param integer $id
      * @return void
      */
-    public function setId(int $id){
+    public function setId($id){
         $id = (int) $id;
         if ($id > 0) {
-            $this->_id = $id;
+            $this->id = $id;
         }
     }
     /**
@@ -65,7 +65,7 @@ class Character {
      */
     public function setName(string $name){
         if (is_string($name)) {
-            $this->_name = $name;
+            $this->name = $name;
         }
     }
     /**
@@ -74,11 +74,12 @@ class Character {
      * @param integer $damage
      * @return void
      */
-    public function setDamage(int $damage){
+    public function setDamage($damage){
         $damage = (int) $damage;
-        if ($damage >= 0 && $damage <= 100) {
-            $this->_damage = $damage;
-        }
+        // if ($damage >= 0 && $damage <= 100) {
+            $this->damage = $damage;
+        // }
+        return $this;
     }
 
     /**
@@ -96,9 +97,10 @@ class Character {
      * @return void
      */
     public function takeDamage(){
-        $this->_damage += 5;
+        $this->damage += 5;
 
-        if ($this->_damage >= 100) {
+        return $this->damage;
+        if ($this->damage >= 100) {
             return $this->getName() . self::KILL;
         }
         return $this->getName() . self::DAMAGE_TAKEN;

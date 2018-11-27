@@ -25,14 +25,26 @@ class CharacterManager{
     }
 
     public function getChars(){
-        $query = $this->getDb()->query('SELECT * from characters');
+        $query = $this->getDb()->query('SELECT * FROM characters');
         $chars = $query->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($chars as $char) {
-            $arrayOfChars[] = new Char($char);
+            $arrayOfChars[] = new Character($char);
         }
 
         return $arrayOfChars;
+    }
+    public function exists($name){
+        $query = $this->getDb()->prepare('SELECT * FROM characters WHERE name = :name');
+        $query->bindValue(':name', $name, PDO::PARAM_STR);
+        $query->execute();
+        $existName = $query->fetch();
+        if ($existName) {
+            return true; 
+        }
+        else{
+            return false;
+        }
     }
     /**
      * insert new char in our database
@@ -41,12 +53,14 @@ class CharacterManager{
      * @return void
      */
     public function addChar(Character $char){
-        $req = $this->getDb()->prepare('INSERT INTO characters(id, name, damage) VALUES(:name, :damage');
 
-        $req->bindValue(':name', $char->getName(), PDO::PARAM_STR);
-        $req->bindValue(':damage', $char->getDamage(), PDO::PARAM_INT);
+        $req = $this->getDb()->prepare('INSERT INTO characters(name, damage) VALUES(:name, :damage)');
+
+        $req->bindValue('name', $char->getName(), PDO::PARAM_STR);
+        $req->bindValue('damage', $char->getDamage(), PDO::PARAM_INT);
     
         $req->execute();
+
     }
     /**
      * select a special char with a define id
@@ -54,11 +68,13 @@ class CharacterManager{
      * @param [type] $id
      * @return void
      */
-    public function selectChar(int $id){
-        $id = (int) $id;
-        $req = $this->_db->query('SELECT id, name, damage FROM characters WHERE id = '. $id);
-        $data = $req->fetch(PDO::FETCH_ASSOC);
+    public function selectChar(string $name){
+        // $req = $this->getDb()->query('SELECT * FROM characters WHERE name = '. $name);
+        $req = $this->getDb()->prepare('SELECT * FROM characters WHERE name = :name');
+        $req->bindValue('name', $name, PDO::PARAM_STR);
+        $req->execute();
 
+        $data = $req->fetch(PDO::FETCH_ASSOC);
         return new Character($data);
     }
     /**
@@ -69,7 +85,7 @@ class CharacterManager{
      */
     public function updateChar(Character $char){
 
-        $req = $this->_db->prepare('UPDATE characters SET damage = :damage WHERE id = :id');
+        $req = $this->getDb()->prepare('UPDATE characters SET damage = :damage WHERE id = :id');
 
         $req->bindValue(':damage', $char->getDamage(), PDO::PARAM_INT);
         $req->bindValue(':id', $char->getId(), PDO::PARAM_INT);
@@ -83,6 +99,8 @@ class CharacterManager{
      * @return void
      */
     public function deleteChar(Character $char){
-        $this->_db->exec('DELETE FROM characters WHERE id = ' . $char->getId());
+        $req = $this->getDb()->prepare('DELETE FROM characters WHERE id = :id');
+        $req->bindValue('id', $char->getId(), PDO::PARAM_INT);
+        $req->execute();
     }
 }
